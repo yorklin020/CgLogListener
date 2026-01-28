@@ -1,4 +1,4 @@
-﻿namespace CgLogListener
+namespace CgLogListener
 {
     partial class FormMain
     {
@@ -38,10 +38,15 @@
             this.toolExit = new System.Windows.Forms.ToolStripMenuItem();
             this.txtCgLogPath = new System.Windows.Forms.TextBox();
             this.btnSelectLogPath = new System.Windows.Forms.Button();
+            this.lblAppName = new System.Windows.Forms.Label();
+            this.txtAppName = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.chkCookingReminder = new System.Windows.Forms.CheckBox();
+            this.txtCookingInterval = new System.Windows.Forms.TextBox();
+            this.lblCookingUnit = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.cgLogListenerTrackBar = new CgLogListener.CgLogListenerTrackBar();
-            this.cgLogListenerSettingCheckBox1 = new CgLogListener.CgLogListenerCheckBox();
+            this.lblSoundVol = new System.Windows.Forms.Label();
             this.cgLogListenerCheckBox6 = new CgLogListener.CgLogListenerCheckBox();
             this.cgLogListenerCheckBox5 = new CgLogListener.CgLogListenerCheckBox();
             this.cgLogListenerCheckBox4 = new CgLogListener.CgLogListenerCheckBox();
@@ -52,8 +57,10 @@
             this.btnAddCus = new System.Windows.Forms.Button();
             this.cgLogListenerCheckBox2 = new CgLogListener.CgLogListenerCheckBox();
             this.cgLogListenerCheckBox1 = new CgLogListener.CgLogListenerCheckBox();
+            this.timerCooking = new System.Windows.Forms.Timer(this.components);
             this.btnExit = new System.Windows.Forms.Button();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.cgLogListenerCheckBox7 = new CgLogListener.CgLogListenerCheckBox();
             this.notifyIconContextMenu.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cgLogListenerTrackBar)).BeginInit();
@@ -78,46 +85,49 @@
             this.toolExit});
             this.notifyIconContextMenu.Name = "notifyIconContextMenu";
             this.notifyIconContextMenu.ShowImageMargin = false;
-            this.notifyIconContextMenu.Size = new System.Drawing.Size(86, 76);
+            this.notifyIconContextMenu.Size = new System.Drawing.Size(99, 82);
             // 
             // toolOpen
             // 
             this.toolOpen.Name = "toolOpen";
-            this.toolOpen.Size = new System.Drawing.Size(85, 22);
+            this.toolOpen.Size = new System.Drawing.Size(98, 24);
             this.toolOpen.Text = "開啟";
             this.toolOpen.Click += new System.EventHandler(this.ToolOpen_Click);
             // 
             // toolMinsize
             // 
             this.toolMinsize.Name = "toolMinsize";
-            this.toolMinsize.Size = new System.Drawing.Size(85, 22);
+            this.toolMinsize.Size = new System.Drawing.Size(98, 24);
             this.toolMinsize.Text = "最小化";
             this.toolMinsize.Click += new System.EventHandler(this.ToolMinsize_Click);
             // 
             // toolSep1
             // 
             this.toolSep1.Name = "toolSep1";
-            this.toolSep1.Size = new System.Drawing.Size(82, 6);
+            this.toolSep1.Size = new System.Drawing.Size(95, 6);
             // 
             // toolExit
             // 
             this.toolExit.Name = "toolExit";
-            this.toolExit.Size = new System.Drawing.Size(85, 22);
+            this.toolExit.Size = new System.Drawing.Size(98, 24);
             this.toolExit.Text = "結束";
             this.toolExit.Click += new System.EventHandler(this.ToolExit_Click);
             // 
             // txtCgLogPath
             // 
+            this.txtCgLogPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtCgLogPath.Location = new System.Drawing.Point(11, 9);
             this.txtCgLogPath.Margin = new System.Windows.Forms.Padding(2);
             this.txtCgLogPath.Name = "txtCgLogPath";
             this.txtCgLogPath.ReadOnly = true;
-            this.txtCgLogPath.Size = new System.Drawing.Size(219, 22);
+            this.txtCgLogPath.Size = new System.Drawing.Size(375, 25);
             this.txtCgLogPath.TabIndex = 1;
             // 
             // btnSelectLogPath
             // 
-            this.btnSelectLogPath.Location = new System.Drawing.Point(234, 8);
+            this.btnSelectLogPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectLogPath.Location = new System.Drawing.Point(390, 8);
             this.btnSelectLogPath.Margin = new System.Windows.Forms.Padding(2);
             this.btnSelectLogPath.Name = "btnSelectLogPath";
             this.btnSelectLogPath.Size = new System.Drawing.Size(53, 22);
@@ -126,11 +136,38 @@
             this.btnSelectLogPath.UseVisualStyleBackColor = true;
             this.btnSelectLogPath.Click += new System.EventHandler(this.BtnSelectLogPath_Click);
             // 
+            // lblAppName
+            // 
+            this.lblAppName.AutoSize = true;
+            this.lblAppName.Location = new System.Drawing.Point(11, 38);
+            this.lblAppName.Name = "lblAppName";
+            this.lblAppName.Size = new System.Drawing.Size(82, 15);
+            this.lblAppName.TabIndex = 20;
+            this.lblAppName.Text = "應用名稱：";
+            // 
+            // txtAppName
+            // 
+            this.txtAppName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtAppName.Location = new System.Drawing.Point(98, 35);
+            this.txtAppName.Margin = new System.Windows.Forms.Padding(2);
+            this.txtAppName.Name = "txtAppName";
+            this.txtAppName.Size = new System.Drawing.Size(335, 25);
+            this.txtAppName.TabIndex = 21;
+            this.txtAppName.Leave += new System.EventHandler(this.TxtAppName_Leave);
+            // 
             // panel1
             // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.cgLogListenerCheckBox7);
+            this.panel1.Controls.Add(this.chkCookingReminder);
+            this.panel1.Controls.Add(this.txtCookingInterval);
+            this.panel1.Controls.Add(this.lblCookingUnit);
             this.panel1.Controls.Add(this.checkBox1);
             this.panel1.Controls.Add(this.cgLogListenerTrackBar);
-            this.panel1.Controls.Add(this.cgLogListenerSettingCheckBox1);
+            this.panel1.Controls.Add(this.lblSoundVol);
             this.panel1.Controls.Add(this.cgLogListenerCheckBox6);
             this.panel1.Controls.Add(this.cgLogListenerCheckBox5);
             this.panel1.Controls.Add(this.cgLogListenerCheckBox4);
@@ -141,18 +178,47 @@
             this.panel1.Controls.Add(this.btnAddCus);
             this.panel1.Controls.Add(this.cgLogListenerCheckBox2);
             this.panel1.Controls.Add(this.cgLogListenerCheckBox1);
-            this.panel1.Location = new System.Drawing.Point(11, 38);
+            this.panel1.Location = new System.Drawing.Point(11, 62);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(276, 255);
+            this.panel1.Size = new System.Drawing.Size(433, 266);
             this.panel1.TabIndex = 6;
+            // 
+            // chkCookingReminder
+            // 
+            this.chkCookingReminder.AutoSize = true;
+            this.chkCookingReminder.Location = new System.Drawing.Point(2, 225);
+            this.chkCookingReminder.Name = "chkCookingReminder";
+            this.chkCookingReminder.Size = new System.Drawing.Size(104, 19);
+            this.chkCookingReminder.TabIndex = 15;
+            this.chkCookingReminder.Text = "吃料理通知";
+            this.chkCookingReminder.UseVisualStyleBackColor = true;
+            this.chkCookingReminder.CheckedChanged += new System.EventHandler(this.ChkCookingReminder_CheckedChanged);
+            // 
+            // txtCookingInterval
+            // 
+            this.txtCookingInterval.Location = new System.Drawing.Point(112, 223);
+            this.txtCookingInterval.Name = "txtCookingInterval";
+            this.txtCookingInterval.Size = new System.Drawing.Size(40, 25);
+            this.txtCookingInterval.TabIndex = 16;
+            this.txtCookingInterval.Text = "180";
+            this.txtCookingInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // lblCookingUnit
+            // 
+            this.lblCookingUnit.AutoSize = true;
+            this.lblCookingUnit.Location = new System.Drawing.Point(132, 226);
+            this.lblCookingUnit.Name = "lblCookingUnit";
+            this.lblCookingUnit.Size = new System.Drawing.Size(22, 15);
+            this.lblCookingUnit.TabIndex = 17;
+            this.lblCookingUnit.Text = "秒";
             // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(2, 230);
+            this.checkBox1.Location = new System.Drawing.Point(2, 205);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(93, 16);
+            this.checkBox1.Size = new System.Drawing.Size(113, 19);
             this.checkBox1.TabIndex = 13;
             this.checkBox1.Text = "Custom Notify";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -161,24 +227,21 @@
             // 
             this.cgLogListenerTrackBar.AutoSize = false;
             this.cgLogListenerTrackBar.LargeChange = 1;
-            this.cgLogListenerTrackBar.Location = new System.Drawing.Point(2, 197);
+            this.cgLogListenerTrackBar.Location = new System.Drawing.Point(50, 172);
             this.cgLogListenerTrackBar.Name = "cgLogListenerTrackBar";
             this.cgLogListenerTrackBar.NameInSetting = "SoundVol";
-            this.cgLogListenerTrackBar.Size = new System.Drawing.Size(108, 27);
+            this.cgLogListenerTrackBar.Size = new System.Drawing.Size(70, 27);
             this.cgLogListenerTrackBar.TabIndex = 12;
             this.cgLogListenerTrackBar.Value = 5;
             // 
-            // cgLogListenerSettingCheckBox1
+            // lblSoundVol
             // 
-            this.cgLogListenerSettingCheckBox1.AutoSize = true;
-            this.cgLogListenerSettingCheckBox1.Location = new System.Drawing.Point(2, 172);
-            this.cgLogListenerSettingCheckBox1.Name = "cgLogListenerSettingCheckBox1";
-            this.cgLogListenerSettingCheckBox1.NameInSetting = "PlaySound";
-            this.cgLogListenerSettingCheckBox1.RegexPattern = null;
-            this.cgLogListenerSettingCheckBox1.Size = new System.Drawing.Size(72, 16);
-            this.cgLogListenerSettingCheckBox1.TabIndex = 8;
-            this.cgLogListenerSettingCheckBox1.Text = "播放音效";
-            this.cgLogListenerSettingCheckBox1.UseVisualStyleBackColor = true;
+            this.lblSoundVol.AutoSize = true;
+            this.lblSoundVol.Location = new System.Drawing.Point(2, 177);
+            this.lblSoundVol.Name = "lblSoundVol";
+            this.lblSoundVol.Size = new System.Drawing.Size(52, 15);
+            this.lblSoundVol.TabIndex = 14;
+            this.lblSoundVol.Text = "音量：";
             // 
             // cgLogListenerCheckBox6
             // 
@@ -187,7 +250,7 @@
             this.cgLogListenerCheckBox6.Name = "cgLogListenerCheckBox6";
             this.cgLogListenerCheckBox6.NameInSetting = "ReMaze";
             this.cgLogListenerCheckBox6.RegexPattern = "你感覺到一股不可思議的力量，而『.*』好像快(要?)消失了。";
-            this.cgLogListenerCheckBox6.Size = new System.Drawing.Size(96, 16);
+            this.cgLogListenerCheckBox6.Size = new System.Drawing.Size(119, 19);
             this.cgLogListenerCheckBox6.TabIndex = 8;
             this.cgLogListenerCheckBox6.Text = "迷宮重組通知";
             this.cgLogListenerCheckBox6.UseVisualStyleBackColor = true;
@@ -199,7 +262,7 @@
             this.cgLogListenerCheckBox5.Name = "cgLogListenerCheckBox5";
             this.cgLogListenerCheckBox5.NameInSetting = "Sell";
             this.cgLogListenerCheckBox5.RegexPattern = "您順利賣掉了一個.*，(收入|獲得).*魔幣！";
-            this.cgLogListenerCheckBox5.Size = new System.Drawing.Size(96, 16);
+            this.cgLogListenerCheckBox5.Size = new System.Drawing.Size(119, 19);
             this.cgLogListenerCheckBox5.TabIndex = 8;
             this.cgLogListenerCheckBox5.Text = "擺攤售出通知";
             this.cgLogListenerCheckBox5.UseVisualStyleBackColor = true;
@@ -211,7 +274,7 @@
             this.cgLogListenerCheckBox4.Name = "cgLogListenerCheckBox4";
             this.cgLogListenerCheckBox4.NameInSetting = "PlayerJoin";
             this.cgLogListenerCheckBox4.RegexPattern = "加入了(你|您)的隊伍。";
-            this.cgLogListenerCheckBox4.Size = new System.Drawing.Size(108, 16);
+            this.cgLogListenerCheckBox4.Size = new System.Drawing.Size(134, 19);
             this.cgLogListenerCheckBox4.TabIndex = 8;
             this.cgLogListenerCheckBox4.Text = "被加入隊伍通知";
             this.cgLogListenerCheckBox4.UseVisualStyleBackColor = true;
@@ -223,34 +286,38 @@
             this.cgLogListenerCheckBox3.Name = "cgLogListenerCheckBox3";
             this.cgLogListenerCheckBox3.NameInSetting = "MP0";
             this.cgLogListenerCheckBox3.RegexPattern = "魔力不足。";
-            this.cgLogListenerCheckBox3.Size = new System.Drawing.Size(96, 16);
+            this.cgLogListenerCheckBox3.Size = new System.Drawing.Size(119, 19);
             this.cgLogListenerCheckBox3.TabIndex = 8;
             this.cgLogListenerCheckBox3.Text = "魔力不足通知";
             this.cgLogListenerCheckBox3.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(126, 2);
+            this.label1.Location = new System.Drawing.Point(275, 2);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 12);
+            this.label1.Size = new System.Drawing.Size(82, 15);
             this.label1.TabIndex = 11;
             this.label1.Text = "自訂關鍵字";
             // 
             // cgLogListenerListBox
             // 
+            this.cgLogListenerListBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cgLogListenerListBox.FormattingEnabled = true;
-            this.cgLogListenerListBox.ItemHeight = 12;
-            this.cgLogListenerListBox.Location = new System.Drawing.Point(127, 20);
+            this.cgLogListenerListBox.ItemHeight = 15;
+            this.cgLogListenerListBox.Location = new System.Drawing.Point(275, 20);
             this.cgLogListenerListBox.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.cgLogListenerListBox.Name = "cgLogListenerListBox";
             this.cgLogListenerListBox.NotifyIcon = this.notifyIcon;
-            this.cgLogListenerListBox.Size = new System.Drawing.Size(147, 148);
+            this.cgLogListenerListBox.Size = new System.Drawing.Size(147, 169);
             this.cgLogListenerListBox.TabIndex = 9;
             // 
             // btnDelCus
             // 
-            this.btnDelCus.Location = new System.Drawing.Point(178, 181);
+            this.btnDelCus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDelCus.Location = new System.Drawing.Point(326, 221);
             this.btnDelCus.Margin = new System.Windows.Forms.Padding(2);
             this.btnDelCus.Name = "btnDelCus";
             this.btnDelCus.Size = new System.Drawing.Size(47, 22);
@@ -261,7 +328,8 @@
             // 
             // btnAddCus
             // 
-            this.btnAddCus.Location = new System.Drawing.Point(127, 181);
+            this.btnAddCus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAddCus.Location = new System.Drawing.Point(275, 221);
             this.btnAddCus.Margin = new System.Windows.Forms.Padding(2);
             this.btnAddCus.Name = "btnAddCus";
             this.btnAddCus.Size = new System.Drawing.Size(47, 22);
@@ -278,7 +346,7 @@
             this.cgLogListenerCheckBox2.Name = "cgLogListenerCheckBox2";
             this.cgLogListenerCheckBox2.NameInSetting = "ItemFull";
             this.cgLogListenerCheckBox2.RegexPattern = "物品欄沒有空位。";
-            this.cgLogListenerCheckBox2.Size = new System.Drawing.Size(84, 16);
+            this.cgLogListenerCheckBox2.Size = new System.Drawing.Size(104, 19);
             this.cgLogListenerCheckBox2.TabIndex = 1;
             this.cgLogListenerCheckBox2.Text = "道具滿通知";
             this.cgLogListenerCheckBox2.UseVisualStyleBackColor = true;
@@ -291,15 +359,20 @@
             this.cgLogListenerCheckBox1.Name = "cgLogListenerCheckBox1";
             this.cgLogListenerCheckBox1.NameInSetting = "Health";
             this.cgLogListenerCheckBox1.RegexPattern = "在工作時不小心受傷了。";
-            this.cgLogListenerCheckBox1.Size = new System.Drawing.Size(96, 16);
+            this.cgLogListenerCheckBox1.Size = new System.Drawing.Size(119, 19);
             this.cgLogListenerCheckBox1.TabIndex = 1;
             this.cgLogListenerCheckBox1.Text = "採集受傷通知";
             this.cgLogListenerCheckBox1.UseVisualStyleBackColor = true;
             // 
+            // timerCooking
+            // 
+            this.timerCooking.Interval = 180000;
+            this.timerCooking.Tick += new System.EventHandler(this.TimerCooking_Tick);
+            // 
             // btnExit
             // 
-            this.btnExit.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnExit.Location = new System.Drawing.Point(198, 300);
+            this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExit.Location = new System.Drawing.Point(355, 335);
             this.btnExit.Margin = new System.Windows.Forms.Padding(2);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(89, 22);
@@ -310,29 +383,43 @@
             // 
             // linkLabel1
             // 
+            this.linkLabel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(9, 311);
+            this.linkLabel1.Location = new System.Drawing.Point(9, 340);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(65, 12);
+            this.linkLabel1.Size = new System.Drawing.Size(82, 15);
             this.linkLabel1.TabIndex = 7;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "關於本程式";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1_LinkClicked);
             // 
+            // cgLogListenerCheckBox7
+            // 
+            this.cgLogListenerCheckBox7.AutoSize = true;
+            this.cgLogListenerCheckBox7.Location = new System.Drawing.Point(2, 147);
+            this.cgLogListenerCheckBox7.Name = "cgLogListenerCheckBox7";
+            this.cgLogListenerCheckBox7.NameInSetting = "ReMaze";
+            this.cgLogListenerCheckBox7.RegexPattern = "壞掉了";
+            this.cgLogListenerCheckBox7.Size = new System.Drawing.Size(119, 19);
+            this.cgLogListenerCheckBox7.TabIndex = 18;
+            this.cgLogListenerCheckBox7.Text = "物品損壞通知";
+            this.cgLogListenerCheckBox7.UseVisualStyleBackColor = true;
+            // 
             // FormMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(298, 333);
+            this.ClientSize = new System.Drawing.Size(455, 365);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.panel1);
+            this.Controls.Add(this.lblAppName);
+            this.Controls.Add(this.txtAppName);
             this.Controls.Add(this.btnSelectLogPath);
             this.Controls.Add(this.txtCgLogPath);
             this.Controls.Add(this.btnExit);
             this.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(360, 325);
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "魔力Log監視";
@@ -354,6 +441,8 @@
         private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.TextBox txtCgLogPath;
         private System.Windows.Forms.Button btnSelectLogPath;
+        private System.Windows.Forms.Label lblAppName;
+        private System.Windows.Forms.TextBox txtAppName;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnDelCus;
         private System.Windows.Forms.Button btnAddCus;
@@ -371,10 +460,14 @@
         private CgLogListenerCheckBox cgLogListenerCheckBox4;
         private CgLogListenerCheckBox cgLogListenerCheckBox5;
         private System.Windows.Forms.LinkLabel linkLabel1;
-        private CgLogListenerCheckBox cgLogListenerSettingCheckBox1;
         private CgLogListenerCheckBox cgLogListenerCheckBox6;
         private CgLogListenerTrackBar cgLogListenerTrackBar;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Label lblSoundVol;
+        private System.Windows.Forms.CheckBox chkCookingReminder;
+        private System.Windows.Forms.TextBox txtCookingInterval;
+        private System.Windows.Forms.Label lblCookingUnit;
+        private System.Windows.Forms.Timer timerCooking;
+        private CgLogListenerCheckBox cgLogListenerCheckBox7;
     }
 }
-

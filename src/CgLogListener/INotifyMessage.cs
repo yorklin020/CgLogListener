@@ -7,6 +7,6 @@ namespace CgLogListener
 {
     public interface INotifyMessage
     {
-        bool Notify(string message);
+        NotifyResult Notify(string message);
     }
 }

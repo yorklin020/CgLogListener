@@ -1,4 +1,4 @@
-﻿using IniParser;
+using IniParser;
 using IniParser.Model;
 using System;
 using System.Collections.Generic;
@@ -14,15 +14,16 @@ namespace CgLogListener
         const string settingsFileName = "settings.ini";
         const string settingsBaseSection = "base";
         const string settingsStandardTipsSection = "standard tips";
+        const string settingsCustomTipsSection = "custom tips";
         const string custmizeFileName = "custmize.dat";
 
+        public string AppName { get; private set; }
         public bool CustomNotify { get; private set; }
         public string CustomNotifier { get; private set; }
-        public bool PlaySound { get; private set; }
         public int SoundVol { get; private set; }
         public string CgLogPath { get; private set; }
-        public Dictionary<string, bool> StandardTips { get; private set; } = new Dictionary<string, bool>();
-        public List<string> CustomizeTips { get; private set; } = new List<string>();
+        public Dictionary<string, TipNotifyOptions> StandardTips { get; private set; } = new Dictionary<string, TipNotifyOptions>();
+        public Dictionary<string, TipNotifyOptions> CustomizeTips { get; private set; } = new Dictionary<string, TipNotifyOptions>();
 
         public static Settings GetInstance()
         {
@@ -39,11 +40,9 @@ namespace CgLogListener
         {
             if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), settingsFileName)))
             {
-                // gen new conf file
                 GenConfigFile();
             }
 
-            // load settings
             LoadSettings();
         }
 
@@ -53,24 +52,39 @@ namespace CgLogListener
             var iniData = fileIniDataParser.ReadFile(settingsFileName);
 
             var baseData = iniData[settingsBaseSection];
+            AppName = baseData[nameof(AppName)] ?? "CgLogListener";
+            if (string.IsNullOrEmpty(AppName)) AppName = "CgLogListener";
             CgLogPath = baseData[nameof(CgLogPath)];
-            PlaySound = baseData[nameof(PlaySound)] == "1";
-            SoundVol = int.Parse(baseData[nameof(SoundVol)]);
+            SoundVol = int.Parse(baseData[nameof(SoundVol)] ?? "5");
             CustomNotify = baseData[nameof(CustomNotify)] == "1";
             CustomNotifier = baseData[nameof(CustomNotifier)];
 
+            // 載入標準關鍵字設定
             var standardTipData = iniData[settingsStandardTipsSection];
             foreach (var kd in standardTipData)
             {
-                StandardTips.Add(kd.KeyName, kd.Value == "1");
+                StandardTips[kd.KeyName] = TipNotifyOptions.Parse(kd.Value);
             }
 
+            // 載入自訂關鍵字設定
+            var customTipData = iniData[settingsCustomTipsSection];
+            foreach (var kd in customTipData)
+            {
+                CustomizeTips[kd.KeyName] = TipNotifyOptions.Parse(kd.Value);
+            }
+
+            // 相容舊版：讀取舊的 custmize.dat
             if (File.Exists(custmizeFileName))
             {
                 foreach (var s in File.ReadAllLines(custmizeFileName))
                 {
-                    CustomizeTips.Add(s);
+                    if (!string.IsNullOrEmpty(s) && !CustomizeTips.ContainsKey(s))
+                    {
+                        CustomizeTips[s] = new TipNotifyOptions(true, true, false);
+                    }
                 }
+                // 遷移後刪除舊檔
+                try { File.Delete(custmizeFileName); } catch { }
             }
         }
 
@@ -78,8 +92,8 @@ namespace CgLogListener
         {
             var iniData = new IniData();
             var baseSection = iniData[settingsBaseSection];
+            baseSection[nameof(AppName)] = "CgLogListener";
             baseSection[nameof(CgLogPath)] = string.Empty;
-            baseSection[nameof(PlaySound)] = "1";
             baseSection[nameof(SoundVol)] = "5";
             baseSection[nameof(CustomNotify)] = "0";
 
@@ -93,8 +107,8 @@ namespace CgLogListener
             var iniData = new IniData();
 
             var baseSection = iniData[settingsBaseSection];
+            baseSection[nameof(AppName)] = AppName;
             baseSection[nameof(CgLogPath)] = CgLogPath;
-            baseSection[nameof(PlaySound)] = PlaySound ? "1" : "0";
             baseSection[nameof(SoundVol)] = SoundVol.ToString();
             baseSection[nameof(CustomNotify)] = CustomNotify ? "1" : "0";
             baseSection[nameof(CustomNotifier)] = CustomNotifier;
@@ -102,12 +116,16 @@ namespace CgLogListener
             var standardTipData = iniData[settingsStandardTipsSection];
             foreach (var kv in StandardTips)
             {
-                standardTipData[kv.Key] = kv.Value ? "1" : "0";
+                standardTipData[kv.Key] = kv.Value.ToString();
+            }
+
+            var customTipData = iniData[settingsCustomTipsSection];
+            foreach (var kv in CustomizeTips)
+            {
+                customTipData[kv.Key] = kv.Value.ToString();
             }
 
             fileIniDataParser.WriteFile(settingsFileName, iniData);
-
-            File.WriteAllLines(custmizeFileName, CustomizeTips);
         }
 
         internal void SetCgLogPath(string cgLogPath)
@@ -116,15 +134,39 @@ namespace CgLogListener
             UpdateConfig();
         }
 
-        internal void SetStandardTip(string nameInSetting, bool @checked)
+        internal void SetStandardTip(string nameInSetting, TipNotifyOptions options)
         {
-            StandardTips[nameInSetting] = @checked;
+            StandardTips[nameInSetting] = options;
             UpdateConfig();
         }
 
-        internal void SetPlaySound(bool @checked)
+        internal void SetStandardTipEnabled(string nameInSetting, bool enabled)
         {
-            PlaySound = @checked;
+            if (!StandardTips.ContainsKey(nameInSetting))
+            {
+                StandardTips[nameInSetting] = new TipNotifyOptions();
+            }
+            StandardTips[nameInSetting].Enabled = enabled;
+            UpdateConfig();
+        }
+
+        internal void SetStandardTipPlaySound(string nameInSetting, bool playSound)
+        {
+            if (!StandardTips.ContainsKey(nameInSetting))
+            {
+                StandardTips[nameInSetting] = new TipNotifyOptions();
+            }
+            StandardTips[nameInSetting].PlaySound = playSound;
+            UpdateConfig();
+        }
+
+        internal void SetStandardTipSendMail(string nameInSetting, bool sendMail)
+        {
+            if (!StandardTips.ContainsKey(nameInSetting))
+            {
+                StandardTips[nameInSetting] = new TipNotifyOptions();
+            }
+            StandardTips[nameInSetting].SendMail = sendMail;
             UpdateConfig();
         }
 
@@ -134,16 +176,43 @@ namespace CgLogListener
             UpdateConfig();
         }
 
-        internal void AddCustmizeTip(string value)
+        internal void AddCustomizeTip(string keyword, TipNotifyOptions options)
         {
-            CustomizeTips.Add(value);
+            CustomizeTips[keyword] = options;
             UpdateConfig();
         }
 
-        internal void RemoveCustmizeTip(string value)
+        internal void RemoveCustomizeTip(string keyword)
         {
-            CustomizeTips.Remove(value);
+            CustomizeTips.Remove(keyword);
             UpdateConfig();
+        }
+
+        internal void SetCustomizeTipEnabled(string keyword, bool enabled)
+        {
+            if (CustomizeTips.ContainsKey(keyword))
+            {
+                CustomizeTips[keyword].Enabled = enabled;
+                UpdateConfig();
+            }
+        }
+
+        internal void SetCustomizeTipPlaySound(string keyword, bool playSound)
+        {
+            if (CustomizeTips.ContainsKey(keyword))
+            {
+                CustomizeTips[keyword].PlaySound = playSound;
+                UpdateConfig();
+            }
+        }
+
+        internal void SetCustomizeTipSendMail(string keyword, bool sendMail)
+        {
+            if (CustomizeTips.ContainsKey(keyword))
+            {
+                CustomizeTips[keyword].SendMail = sendMail;
+                UpdateConfig();
+            }
         }
 
         internal void SetCustomNotifier(string value)
@@ -155,6 +224,12 @@ namespace CgLogListener
         internal void SetCustomNotify(bool value)
         {
             CustomNotify = value;
+            UpdateConfig();
+        }
+
+        internal void SetAppName(string value)
+        {
+            AppName = string.IsNullOrEmpty(value) ? "CgLogListener" : value;
             UpdateConfig();
         }
     }

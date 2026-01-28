@@ -1,7 +1,10 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -13,6 +16,8 @@ namespace CgLogListener
         private Settings settings;
         private CgLogHandler watcher;
         private readonly MediaPlayer mp = new MediaPlayer();
+        private readonly Dictionary<string, CheckBox> soundCheckBoxes = new Dictionary<string, CheckBox>();
+        private readonly Dictionary<string, CheckBox> mailCheckBoxes = new Dictionary<string, CheckBox>();
 
         public FormMain()
         {
@@ -27,6 +32,10 @@ namespace CgLogListener
         private void FrmMain_Load(object sender, EventArgs e)
         {
             settings = Settings.GetInstance();
+
+            // 設定通知標題
+            txtAppName.Text = settings.AppName;
+            UpdateAppTitle();
 
             if (string.IsNullOrEmpty(settings.CgLogPath))
             {
@@ -43,7 +52,6 @@ namespace CgLogListener
 
             if (!Directory.Exists(settings.CgLogPath) || !CgLogHandler.ValidationPath(settings.CgLogPath))
             {
-                // the dir path invalid, set to default and exit
                 settings.SetCgLogPath(string.Empty);
                 MessageBox.Show(this, "設定檔路徑錯誤, 請重新啟動", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
@@ -52,56 +60,107 @@ namespace CgLogListener
 
             BindWatcher();
 
-            // set playsound check
-            cgLogListenerSettingCheckBox1.Checked = settings.PlaySound;
-
             // set playsound vol
             cgLogListenerTrackBar.Value = settings.SoundVol;
 
             // set line notify
             checkBox1.Checked = settings.CustomNotify;
 
-            // set default tips check
-            foreach (var chk in panel1.Controls.OfType<CgLogListenerCheckBox>())
-            {
-                // skip playsound
-                if (chk == cgLogListenerSettingCheckBox1) { continue; }
+            // 設定標準關鍵字及其音效/郵件選項
+            SetupStandardTips();
 
-                settings.StandardTips.TryGetValue(chk.NameInSetting, out bool isEnable);
-                chk.Checked = isEnable;
-            }
+            // 設定自訂關鍵字
+            SetupCustomTips();
 
-            // set custom tips items
-            settings.CustomizeTips
-                    .ForEach(s =>
-                    {
-                        if (!string.IsNullOrEmpty(s))
-                        {
-                            cgLogListenerListBox.Items.Add(s);
-                        }
-                    });
-
-            cgLogListenerCheckBox1.CheckedChanged += CgLogListenerCheckBox_CheckedChanged;
-            cgLogListenerCheckBox2.CheckedChanged += CgLogListenerCheckBox_CheckedChanged;
-            cgLogListenerCheckBox3.CheckedChanged += CgLogListenerCheckBox_CheckedChanged;
-            cgLogListenerCheckBox4.CheckedChanged += CgLogListenerCheckBox_CheckedChanged;
-            cgLogListenerCheckBox5.CheckedChanged += CgLogListenerCheckBox_CheckedChanged;
-            cgLogListenerCheckBox6.CheckedChanged += CgLogListenerCheckBox_CheckedChanged;
-            cgLogListenerSettingCheckBox1.CheckedChanged += CgLogListenerSettingCheckBox1_CheckedChanged;
             cgLogListenerTrackBar.ValueChanged += CgLogListenerTrackBar_ValueChanged;
             checkBox1.CheckedChanged += CheckBox1_CheckedChanged;
         }
 
-        private void CgLogListenerCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void SetupStandardTips()
         {
-            var chk = (CgLogListenerCheckBox)sender;
-            settings.SetStandardTip(chk.NameInSetting, chk.Checked);
+            var standardCheckBoxes = new[]
+            {
+                cgLogListenerCheckBox1,
+                cgLogListenerCheckBox2,
+                cgLogListenerCheckBox3,
+                cgLogListenerCheckBox4,
+                cgLogListenerCheckBox5,
+                cgLogListenerCheckBox6,
+                cgLogListenerCheckBox7
+            };
+
+            // 固定位置讓 🔊/✉ checkbox 對齊
+            const int soundCheckBoxX = 155;
+            const int mailCheckBoxX = 210;
+
+            foreach (var chk in standardCheckBoxes)
+            {
+                var nameInSetting = chk.NameInSetting;
+
+                // 取得或建立設定
+                if (!settings.StandardTips.TryGetValue(nameInSetting, out TipNotifyOptions options))
+                {
+                    options = new TipNotifyOptions();
+                    settings.SetStandardTip(nameInSetting, options);
+                }
+
+                // 設定主 checkbox
+                chk.Checked = options.Enabled;
+                chk.CheckedChanged += (s, ev) =>
+                {
+                    var cb = (CgLogListenerCheckBox)s;
+                    settings.SetStandardTipEnabled(cb.NameInSetting, cb.Checked);
+                };
+
+                // 動態建立音效 checkbox
+                var soundChk = new CheckBox
+                {
+                    Text = "🔊",
+                    AutoSize = true,
+                    Location = new Point(soundCheckBoxX, chk.Top),
+                    Checked = options.PlaySound,
+                    Font = new Font("Segoe UI Emoji", 8)
+                };
+                soundChk.CheckedChanged += (s, ev) =>
+                {
+                    settings.SetStandardTipPlaySound(nameInSetting, ((CheckBox)s).Checked);
+                };
+                panel1.Controls.Add(soundChk);
+                soundCheckBoxes[nameInSetting] = soundChk;
+
+                // 動態建立郵件 checkbox
+                var mailChk = new CheckBox
+                {
+                    Text = "✉",
+                    AutoSize = true,
+                    Location = new Point(mailCheckBoxX, chk.Top),
+                    Checked = options.SendMail,
+                    Font = new Font("Segoe UI Emoji", 8)
+                };
+                mailChk.CheckedChanged += (s, ev) =>
+                {
+                    var isChecked = ((CheckBox)s).Checked;
+                    if (isChecked && !MailHelper.IsConfigured())
+                    {
+                        MailHelper.GenerateDefaultConfig();
+                        MessageBox.Show(this, "請先設定 mail.ini 檔案中的 SMTP 資訊", "郵件設定", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    settings.SetStandardTipSendMail(nameInSetting, isChecked);
+                };
+                panel1.Controls.Add(mailChk);
+                mailCheckBoxes[nameInSetting] = mailChk;
+            }
         }
 
-        private void CgLogListenerSettingCheckBox1_CheckedChanged(object sender, EventArgs e)
+        private void SetupCustomTips()
         {
-            var chk = (CgLogListenerCheckBox)sender;
-            settings.SetPlaySound(chk.Checked);
+            foreach (var kv in settings.CustomizeTips)
+            {
+                if (!string.IsNullOrEmpty(kv.Key))
+                {
+                    cgLogListenerListBox.Items.Add(kv.Key);
+                }
+            }
         }
 
         private void CgLogListenerTrackBar_ValueChanged(object sender, EventArgs e)
@@ -160,14 +219,31 @@ namespace CgLogListener
 
         void Watcher_OnNewLog(string log)
         {
+            // 吃料理監聽：偵測到「恢復了XXX魔力」就重置計時器
+            if (chkCookingReminder.Checked && Regex.IsMatch(log, @"恢復了\d+魔力"))
+            {
+                Invoke((Action)delegate
+                {
+                    // 重置計時器
+                    timerCooking.Stop();
+                    if (int.TryParse(txtCookingInterval.Text, out int seconds) && seconds > 0)
+                    {
+                        timerCooking.Interval = seconds * 1000;
+                        timerCooking.Start();
+                    }
+                });
+            }
+
             foreach (var n in panel1.Controls.OfType<INotifyMessage>())
             {
-                if (n.Notify(log))
+                var result = n.Notify(log);
+                if (result.IsMatch)
                 {
                     notifyIcon.ShowBalloonTip(1, notifyIcon.BalloonTipTitle, log, ToolTipIcon.None);
 
+                    // 根據該關鍵字的設定決定是否播放音效
                     const string soundName = "sound.wav";
-                    if (settings.PlaySound && File.Exists(soundName))
+                    if (result.PlaySound && File.Exists(soundName))
                     {
                         Invoke((Action)delegate
                         {
@@ -178,13 +254,24 @@ namespace CgLogListener
                         });
                     }
 
+                    // 根據該關鍵字的設定決定是否發送郵件
+                    if (result.SendMail)
+                    {
+                        try
+                        {
+                            MailHelper.SendMail("魔力Log監視通知", log);
+                        }
+                        catch { }
+                    }
+
+                    // Custom Notifier (全域設定)
                     if (settings.CustomNotify)
                     {
                         foreach (var notifier in settings.CustomNotifier.Split(','))
                         {
                             try
                             {
-                                ProcessStartInfo p = new ProcessStartInfo(notifier, $"\"{log}\"")
+                                ProcessStartInfo p = new ProcessStartInfo(notifier, $"\"[{settings.AppName}] {log}\"")
                                 {
                                     WindowStyle = ProcessWindowStyle.Hidden,
                                     CreateNoWindow = true
@@ -195,7 +282,6 @@ namespace CgLogListener
                         }
                     }
 
-                    // break if was trigger
                     break;
                 }
             }
@@ -209,7 +295,7 @@ namespace CgLogListener
                 return;
             }
 
-            settings.AddCustmizeTip(value);
+            settings.AddCustomizeTip(value, new TipNotifyOptions(true, true, false));
             cgLogListenerListBox.Items.Add(value);
         }
 
@@ -221,7 +307,7 @@ namespace CgLogListener
             }
 
             var selectItem = (string)cgLogListenerListBox.SelectedItem;
-            settings.RemoveCustmizeTip(selectItem);
+            settings.RemoveCustomizeTip(selectItem);
             cgLogListenerListBox.Items.Remove(selectItem);
         }
 
@@ -237,6 +323,61 @@ namespace CgLogListener
             {
                 settings.SetCustomNotify(false);
                 settings.SetCustomNotifier(string.Empty);
+            }
+        }
+
+        private void TxtAppName_Leave(object sender, EventArgs e)
+        {
+            var newAppName = txtAppName.Text.Trim();
+            if (string.IsNullOrEmpty(newAppName))
+            {
+                newAppName = "CgLogListener";
+                txtAppName.Text = newAppName;
+            }
+            settings.SetAppName(newAppName);
+            UpdateAppTitle();
+        }
+
+        private void UpdateAppTitle()
+        {
+            var appTitle = $"[{settings.AppName}] 魔力Log監視";
+            notifyIcon.BalloonTipTitle = appTitle;
+            notifyIcon.Text = appTitle;
+            this.Text = appTitle;
+        }
+
+        private void ChkCookingReminder_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkCookingReminder.Checked)
+            {
+                if (!int.TryParse(txtCookingInterval.Text, out int seconds) || seconds <= 0)
+                {
+                    MessageBox.Show("請輸入有效的秒數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    chkCookingReminder.Checked = false;
+                }
+                // 啟用功能，等偵測到「恢復了XXX魔力」才開始計時
+            }
+            else
+            {
+                timerCooking.Stop();
+            }
+        }
+
+        private void TimerCooking_Tick(object sender, EventArgs e)
+        {
+            notifyIcon.ShowBalloonTip(3000, $"[{settings.AppName}] 吃料理通知", "三分鐘到了，吃料理~", ToolTipIcon.Info);
+
+            // 播放音效
+            const string soundName = "sound.wav";
+            if (File.Exists(soundName))
+            {
+                Invoke((Action)delegate
+                {
+                    mp.Stop();
+                    mp.Open(new Uri(new FileInfo(soundName).FullName));
+                    mp.Volume = settings.SoundVol / 10d;
+                    mp.Play();
+                });
             }
         }
 
