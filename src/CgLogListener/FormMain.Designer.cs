@@ -394,11 +394,11 @@ namespace CgLogListener
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1_LinkClicked);
             // 
             // cgLogListenerCheckBox7
-            // 
+            //
             this.cgLogListenerCheckBox7.AutoSize = true;
             this.cgLogListenerCheckBox7.Location = new System.Drawing.Point(2, 147);
             this.cgLogListenerCheckBox7.Name = "cgLogListenerCheckBox7";
-            this.cgLogListenerCheckBox7.NameInSetting = "ReMaze";
+            this.cgLogListenerCheckBox7.NameInSetting = "ItemBroken";
             this.cgLogListenerCheckBox7.RegexPattern = "壞掉了";
             this.cgLogListenerCheckBox7.Size = new System.Drawing.Size(119, 19);
             this.cgLogListenerCheckBox7.TabIndex = 18;
