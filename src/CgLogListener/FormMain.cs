@@ -217,10 +217,24 @@ namespace CgLogListener
             watcher.OnNewLog += Watcher_OnNewLog;
         }
 
+        private const string DefaultCookingPattern = @"恢復了\d+魔力";
+        private const string DefaultCookingMessage = "時間到了，吃料理~";
+
         void Watcher_OnNewLog(string log)
         {
-            // 吃料理監聽：偵測到「恢復了XXX魔力」就重置計時器
-            if (chkCookingReminder.Checked && Regex.IsMatch(log, @"恢復了\d+魔力"))
+            // 吃料理監聽：使用自定義 Regex pattern 偵測
+            var cookingPattern = string.IsNullOrWhiteSpace(txtCookingPattern.Text)
+                ? DefaultCookingPattern
+                : txtCookingPattern.Text;
+
+            bool cookingMatch = false;
+            try
+            {
+                cookingMatch = chkCookingReminder.Checked && Regex.IsMatch(log, cookingPattern);
+            }
+            catch { }
+
+            if (cookingMatch)
             {
                 Invoke((Action)delegate
                 {
@@ -289,13 +303,13 @@ namespace CgLogListener
 
         private void BtnAddCus_Click(object sender, EventArgs e)
         {
-            if (FormPrompt.ShowDialog(this, out string value) != DialogResult.OK ||
+            if (FormPrompt.ShowDialog(this, out string value, out TipNotifyOptions options) != DialogResult.OK ||
                 string.IsNullOrEmpty(value))
             {
                 return;
             }
 
-            settings.AddCustomizeTip(value, new TipNotifyOptions(true, true, false));
+            settings.AddCustomizeTip(value, options);
             cgLogListenerListBox.Items.Add(value);
         }
 
@@ -328,6 +342,11 @@ namespace CgLogListener
 
         private void TxtAppName_Leave(object sender, EventArgs e)
         {
+            // 不再自動儲存，由按鈕觸發
+        }
+
+        private void BtnSaveAppName_Click(object sender, EventArgs e)
+        {
             var newAppName = txtAppName.Text.Trim();
             if (string.IsNullOrEmpty(newAppName))
             {
@@ -354,8 +373,23 @@ namespace CgLogListener
                 {
                     MessageBox.Show("請輸入有效的秒數", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     chkCookingReminder.Checked = false;
+                    return;
                 }
-                // 啟用功能，等偵測到「恢復了XXX魔力」才開始計時
+
+                // 驗證 Regex pattern 是否有效
+                var pattern = string.IsNullOrWhiteSpace(txtCookingPattern.Text)
+                    ? DefaultCookingPattern
+                    : txtCookingPattern.Text;
+                try
+                {
+                    Regex.IsMatch("test", pattern);
+                }
+                catch
+                {
+                    MessageBox.Show("Regex 格式錯誤", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    chkCookingReminder.Checked = false;
+                    return;
+                }
             }
             else
             {
@@ -363,9 +397,19 @@ namespace CgLogListener
             }
         }
 
+        private void BtnCookingDefault_Click(object sender, EventArgs e)
+        {
+            txtCookingPattern.Text = DefaultCookingPattern;
+            txtCookingMessage.Text = DefaultCookingMessage;
+        }
+
         private void TimerCooking_Tick(object sender, EventArgs e)
         {
-            notifyIcon.ShowBalloonTip(3000, $"[{settings.AppName}] 吃料理通知", "三分鐘到了，吃料理~", ToolTipIcon.Info);
+            var message = string.IsNullOrWhiteSpace(txtCookingMessage.Text)
+                ? DefaultCookingMessage
+                : txtCookingMessage.Text;
+
+            notifyIcon.ShowBalloonTip(3000, $"[{settings.AppName}] 吃料理通知", message, ToolTipIcon.Info);
 
             // 播放音效
             const string soundName = "sound.wav";
@@ -432,6 +476,13 @@ namespace CgLogListener
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // 確保 AppName 在關閉前儲存
+            var newAppName = txtAppName.Text.Trim();
+            if (!string.IsNullOrEmpty(newAppName) && newAppName != settings.AppName)
+            {
+                settings.SetAppName(newAppName);
+            }
+
             watcher?.Dispose();
             notifyIcon?.Dispose();
         }

@@ -47,8 +47,26 @@ namespace CgLogListener
                 if (!options.Enabled) continue;
 
                 var split = keyword.Split('|');
+                var pattern = split[0];
 
-                if (message.Contains(split[0]))
+                bool isMatch;
+                if (options.IsRegex)
+                {
+                    try
+                    {
+                        isMatch = Regex.IsMatch(message, pattern);
+                    }
+                    catch
+                    {
+                        isMatch = false;
+                    }
+                }
+                else
+                {
+                    isMatch = message.Contains(pattern);
+                }
+
+                if (isMatch)
                 {
                     if (split.Length > 1)
                     {

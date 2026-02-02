@@ -19,6 +19,12 @@ namespace CgLogListener
 
         public static DialogResult ShowDialog(IWin32Window owner, out string value)
         {
+            var result = ShowDialog(owner, out value, out _);
+            return result;
+        }
+
+        public static DialogResult ShowDialog(IWin32Window owner, out string value, out TipNotifyOptions options)
+        {
             FormPrompt f = new FormPrompt();
             DialogResult result = f.ShowDialog(owner);
             value = f.txtValue.Text;
@@ -26,6 +32,13 @@ namespace CgLogListener
             {
                 value += $"|{f.txtExp.Text}";
             }
+
+            options = new TipNotifyOptions(
+                f.chkEnabled.Checked,
+                f.chkPlaySound.Checked,
+                f.chkSendMail.Checked,
+                f.chkIsRegex.Checked
+            );
 
             return result;
         }

@@ -34,6 +34,10 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.txtExp = new System.Windows.Forms.TextBox();
+            this.chkEnabled = new System.Windows.Forms.CheckBox();
+            this.chkPlaySound = new System.Windows.Forms.CheckBox();
+            this.chkSendMail = new System.Windows.Forms.CheckBox();
+            this.chkIsRegex = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnOk
@@ -88,15 +92,63 @@
             this.txtExp.Name = "txtExp";
             this.txtExp.Size = new System.Drawing.Size(165, 21);
             this.txtExp.TabIndex = 2;
-            // 
+            //
+            // chkEnabled
+            //
+            this.chkEnabled.AutoSize = true;
+            this.chkEnabled.Checked = true;
+            this.chkEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkEnabled.Location = new System.Drawing.Point(14, 61);
+            this.chkEnabled.Name = "chkEnabled";
+            this.chkEnabled.Size = new System.Drawing.Size(52, 19);
+            this.chkEnabled.TabIndex = 5;
+            this.chkEnabled.Text = "啟用";
+            this.chkEnabled.UseVisualStyleBackColor = true;
+            //
+            // chkPlaySound
+            //
+            this.chkPlaySound.AutoSize = true;
+            this.chkPlaySound.Checked = true;
+            this.chkPlaySound.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPlaySound.Location = new System.Drawing.Point(72, 61);
+            this.chkPlaySound.Name = "chkPlaySound";
+            this.chkPlaySound.Size = new System.Drawing.Size(52, 19);
+            this.chkPlaySound.TabIndex = 6;
+            this.chkPlaySound.Text = "音效";
+            this.chkPlaySound.UseVisualStyleBackColor = true;
+            //
+            // chkSendMail
+            //
+            this.chkSendMail.AutoSize = true;
+            this.chkSendMail.Location = new System.Drawing.Point(130, 61);
+            this.chkSendMail.Name = "chkSendMail";
+            this.chkSendMail.Size = new System.Drawing.Size(52, 19);
+            this.chkSendMail.TabIndex = 7;
+            this.chkSendMail.Text = "寄信";
+            this.chkSendMail.UseVisualStyleBackColor = true;
+            //
+            // chkIsRegex
+            //
+            this.chkIsRegex.AutoSize = true;
+            this.chkIsRegex.Location = new System.Drawing.Point(188, 61);
+            this.chkIsRegex.Name = "chkIsRegex";
+            this.chkIsRegex.Size = new System.Drawing.Size(58, 19);
+            this.chkIsRegex.TabIndex = 8;
+            this.chkIsRegex.Text = "Regex";
+            this.chkIsRegex.UseVisualStyleBackColor = true;
+            //
             // FormPrompt
-            // 
+            //
             this.AcceptButton = this.btnOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(368, 64);
+            this.ClientSize = new System.Drawing.Size(368, 90);
             this.ControlBox = false;
+            this.Controls.Add(this.chkIsRegex);
+            this.Controls.Add(this.chkSendMail);
+            this.Controls.Add(this.chkPlaySound);
+            this.Controls.Add(this.chkEnabled);
             this.Controls.Add(this.txtExp);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtValue);
@@ -111,7 +163,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = " ";
+            this.Text = "新增自訂關鍵字";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -125,5 +177,9 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtExp;
+        private System.Windows.Forms.CheckBox chkEnabled;
+        private System.Windows.Forms.CheckBox chkPlaySound;
+        private System.Windows.Forms.CheckBox chkSendMail;
+        private System.Windows.Forms.CheckBox chkIsRegex;
     }
 }

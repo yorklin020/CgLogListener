@@ -41,9 +41,13 @@ namespace CgLogListener
             this.lblAppName = new System.Windows.Forms.Label();
             this.txtAppName = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.cgLogListenerCheckBox7 = new CgLogListener.CgLogListenerCheckBox();
             this.chkCookingReminder = new System.Windows.Forms.CheckBox();
             this.txtCookingInterval = new System.Windows.Forms.TextBox();
             this.lblCookingUnit = new System.Windows.Forms.Label();
+            this.txtCookingPattern = new System.Windows.Forms.TextBox();
+            this.txtCookingMessage = new System.Windows.Forms.TextBox();
+            this.btnCookingDefault = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.cgLogListenerTrackBar = new CgLogListener.CgLogListenerTrackBar();
             this.lblSoundVol = new System.Windows.Forms.Label();
@@ -58,9 +62,9 @@ namespace CgLogListener
             this.cgLogListenerCheckBox2 = new CgLogListener.CgLogListenerCheckBox();
             this.cgLogListenerCheckBox1 = new CgLogListener.CgLogListenerCheckBox();
             this.timerCooking = new System.Windows.Forms.Timer(this.components);
+            this.btnSaveAppName = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.cgLogListenerCheckBox7 = new CgLogListener.CgLogListenerCheckBox();
             this.notifyIconContextMenu.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cgLogListenerTrackBar)).BeginInit();
@@ -152,7 +156,7 @@ namespace CgLogListener
             this.txtAppName.Location = new System.Drawing.Point(98, 35);
             this.txtAppName.Margin = new System.Windows.Forms.Padding(2);
             this.txtAppName.Name = "txtAppName";
-            this.txtAppName.Size = new System.Drawing.Size(335, 25);
+            this.txtAppName.Size = new System.Drawing.Size(288, 25);
             this.txtAppName.TabIndex = 21;
             this.txtAppName.Leave += new System.EventHandler(this.TxtAppName_Leave);
             // 
@@ -165,6 +169,9 @@ namespace CgLogListener
             this.panel1.Controls.Add(this.chkCookingReminder);
             this.panel1.Controls.Add(this.txtCookingInterval);
             this.panel1.Controls.Add(this.lblCookingUnit);
+            this.panel1.Controls.Add(this.txtCookingPattern);
+            this.panel1.Controls.Add(this.txtCookingMessage);
+            this.panel1.Controls.Add(this.btnCookingDefault);
             this.panel1.Controls.Add(this.checkBox1);
             this.panel1.Controls.Add(this.cgLogListenerTrackBar);
             this.panel1.Controls.Add(this.lblSoundVol);
@@ -181,8 +188,20 @@ namespace CgLogListener
             this.panel1.Location = new System.Drawing.Point(11, 62);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(433, 266);
+            this.panel1.Size = new System.Drawing.Size(433, 315);
             this.panel1.TabIndex = 6;
+            // 
+            // cgLogListenerCheckBox7
+            // 
+            this.cgLogListenerCheckBox7.AutoSize = true;
+            this.cgLogListenerCheckBox7.Location = new System.Drawing.Point(2, 147);
+            this.cgLogListenerCheckBox7.Name = "cgLogListenerCheckBox7";
+            this.cgLogListenerCheckBox7.NameInSetting = "ItemBroken";
+            this.cgLogListenerCheckBox7.RegexPattern = "壞掉了";
+            this.cgLogListenerCheckBox7.Size = new System.Drawing.Size(119, 19);
+            this.cgLogListenerCheckBox7.TabIndex = 18;
+            this.cgLogListenerCheckBox7.Text = "物品損壞通知";
+            this.cgLogListenerCheckBox7.UseVisualStyleBackColor = true;
             // 
             // chkCookingReminder
             // 
@@ -207,11 +226,37 @@ namespace CgLogListener
             // lblCookingUnit
             // 
             this.lblCookingUnit.AutoSize = true;
-            this.lblCookingUnit.Location = new System.Drawing.Point(132, 226);
+            this.lblCookingUnit.Location = new System.Drawing.Point(155, 226);
             this.lblCookingUnit.Name = "lblCookingUnit";
             this.lblCookingUnit.Size = new System.Drawing.Size(22, 15);
             this.lblCookingUnit.TabIndex = 17;
             this.lblCookingUnit.Text = "秒";
+            // 
+            // txtCookingPattern
+            // 
+            this.txtCookingPattern.Location = new System.Drawing.Point(2, 248);
+            this.txtCookingPattern.Name = "txtCookingPattern";
+            this.txtCookingPattern.Size = new System.Drawing.Size(254, 25);
+            this.txtCookingPattern.TabIndex = 19;
+            this.txtCookingPattern.Text = "恢復了\\d+魔力";
+            // 
+            // txtCookingMessage
+            // 
+            this.txtCookingMessage.Location = new System.Drawing.Point(2, 275);
+            this.txtCookingMessage.Name = "txtCookingMessage";
+            this.txtCookingMessage.Size = new System.Drawing.Size(200, 25);
+            this.txtCookingMessage.TabIndex = 20;
+            this.txtCookingMessage.Text = "時間到了，吃料理~";
+            // 
+            // btnCookingDefault
+            // 
+            this.btnCookingDefault.Location = new System.Drawing.Point(206, 274);
+            this.btnCookingDefault.Name = "btnCookingDefault";
+            this.btnCookingDefault.Size = new System.Drawing.Size(50, 22);
+            this.btnCookingDefault.TabIndex = 21;
+            this.btnCookingDefault.Text = "預設";
+            this.btnCookingDefault.UseVisualStyleBackColor = true;
+            this.btnCookingDefault.Click += new System.EventHandler(this.BtnCookingDefault_Click);
             // 
             // checkBox1
             // 
@@ -222,6 +267,7 @@ namespace CgLogListener
             this.checkBox1.TabIndex = 13;
             this.checkBox1.Text = "Custom Notify";
             this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
             // 
             // cgLogListenerTrackBar
             // 
@@ -303,8 +349,7 @@ namespace CgLogListener
             // 
             // cgLogListenerListBox
             // 
-            this.cgLogListenerListBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cgLogListenerListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cgLogListenerListBox.FormattingEnabled = true;
             this.cgLogListenerListBox.ItemHeight = 15;
             this.cgLogListenerListBox.Location = new System.Drawing.Point(275, 20);
@@ -316,8 +361,8 @@ namespace CgLogListener
             // 
             // btnDelCus
             // 
-            this.btnDelCus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDelCus.Location = new System.Drawing.Point(326, 221);
+            this.btnDelCus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDelCus.Location = new System.Drawing.Point(326, 194);
             this.btnDelCus.Margin = new System.Windows.Forms.Padding(2);
             this.btnDelCus.Name = "btnDelCus";
             this.btnDelCus.Size = new System.Drawing.Size(47, 22);
@@ -328,8 +373,8 @@ namespace CgLogListener
             // 
             // btnAddCus
             // 
-            this.btnAddCus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAddCus.Location = new System.Drawing.Point(275, 221);
+            this.btnAddCus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAddCus.Location = new System.Drawing.Point(275, 194);
             this.btnAddCus.Margin = new System.Windows.Forms.Padding(2);
             this.btnAddCus.Name = "btnAddCus";
             this.btnAddCus.Size = new System.Drawing.Size(47, 22);
@@ -369,6 +414,18 @@ namespace CgLogListener
             this.timerCooking.Interval = 180000;
             this.timerCooking.Tick += new System.EventHandler(this.TimerCooking_Tick);
             // 
+            // btnSaveAppName
+            // 
+            this.btnSaveAppName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSaveAppName.Location = new System.Drawing.Point(390, 34);
+            this.btnSaveAppName.Margin = new System.Windows.Forms.Padding(2);
+            this.btnSaveAppName.Name = "btnSaveAppName";
+            this.btnSaveAppName.Size = new System.Drawing.Size(53, 22);
+            this.btnSaveAppName.TabIndex = 22;
+            this.btnSaveAppName.Text = "儲存";
+            this.btnSaveAppName.UseVisualStyleBackColor = true;
+            this.btnSaveAppName.Click += new System.EventHandler(this.BtnSaveAppName_Click);
+            // 
             // btnExit
             // 
             this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -385,7 +442,7 @@ namespace CgLogListener
             // 
             this.linkLabel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(9, 340);
+            this.linkLabel1.Location = new System.Drawing.Point(8, 391);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(82, 15);
             this.linkLabel1.TabIndex = 7;
@@ -393,26 +450,15 @@ namespace CgLogListener
             this.linkLabel1.Text = "關於本程式";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1_LinkClicked);
             // 
-            // cgLogListenerCheckBox7
-            //
-            this.cgLogListenerCheckBox7.AutoSize = true;
-            this.cgLogListenerCheckBox7.Location = new System.Drawing.Point(2, 147);
-            this.cgLogListenerCheckBox7.Name = "cgLogListenerCheckBox7";
-            this.cgLogListenerCheckBox7.NameInSetting = "ItemBroken";
-            this.cgLogListenerCheckBox7.RegexPattern = "壞掉了";
-            this.cgLogListenerCheckBox7.Size = new System.Drawing.Size(119, 19);
-            this.cgLogListenerCheckBox7.TabIndex = 18;
-            this.cgLogListenerCheckBox7.Text = "物品損壞通知";
-            this.cgLogListenerCheckBox7.UseVisualStyleBackColor = true;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(455, 365);
+            this.ClientSize = new System.Drawing.Size(455, 415);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.lblAppName);
+            this.Controls.Add(this.btnSaveAppName);
             this.Controls.Add(this.txtAppName);
             this.Controls.Add(this.btnSelectLogPath);
             this.Controls.Add(this.txtCgLogPath);
@@ -467,7 +513,11 @@ namespace CgLogListener
         private System.Windows.Forms.CheckBox chkCookingReminder;
         private System.Windows.Forms.TextBox txtCookingInterval;
         private System.Windows.Forms.Label lblCookingUnit;
+        private System.Windows.Forms.TextBox txtCookingPattern;
+        private System.Windows.Forms.TextBox txtCookingMessage;
+        private System.Windows.Forms.Button btnCookingDefault;
         private System.Windows.Forms.Timer timerCooking;
         private CgLogListenerCheckBox cgLogListenerCheckBox7;
+        private System.Windows.Forms.Button btnSaveAppName;
     }
 }
