@@ -38,6 +38,7 @@
             this.chkPlaySound = new System.Windows.Forms.CheckBox();
             this.chkSendMail = new System.Windows.Forms.CheckBox();
             this.chkIsRegex = new System.Windows.Forms.CheckBox();
+            this.chkCustomNotify = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnOk
@@ -137,6 +138,16 @@
             this.chkIsRegex.Text = "Regex";
             this.chkIsRegex.UseVisualStyleBackColor = true;
             //
+            // chkCustomNotify
+            //
+            this.chkCustomNotify.AutoSize = true;
+            this.chkCustomNotify.Location = new System.Drawing.Point(252, 61);
+            this.chkCustomNotify.Name = "chkCustomNotify";
+            this.chkCustomNotify.Size = new System.Drawing.Size(34, 19);
+            this.chkCustomNotify.TabIndex = 9;
+            this.chkCustomNotify.Text = "C";
+            this.chkCustomNotify.UseVisualStyleBackColor = true;
+            //
             // FormPrompt
             //
             this.AcceptButton = this.btnOk;
@@ -145,6 +156,7 @@
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(368, 90);
             this.ControlBox = false;
+            this.Controls.Add(this.chkCustomNotify);
             this.Controls.Add(this.chkIsRegex);
             this.Controls.Add(this.chkSendMail);
             this.Controls.Add(this.chkPlaySound);
@@ -163,7 +175,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "新增自訂關鍵字";
+            this.Text = "新增/編輯自訂關鍵字";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -181,5 +193,6 @@
         private System.Windows.Forms.CheckBox chkPlaySound;
         private System.Windows.Forms.CheckBox chkSendMail;
         private System.Windows.Forms.CheckBox chkIsRegex;
+        private System.Windows.Forms.CheckBox chkCustomNotify;
     }
 }

@@ -18,7 +18,6 @@ namespace CgLogListener
         const string custmizeFileName = "custmize.dat";
 
         public string AppName { get; private set; }
-        public bool CustomNotify { get; private set; }
         public string CustomNotifier { get; private set; }
         public int SoundVol { get; private set; }
         public string CgLogPath { get; private set; }
@@ -56,7 +55,6 @@ namespace CgLogListener
             if (string.IsNullOrEmpty(AppName)) AppName = "CgLogListener";
             CgLogPath = baseData[nameof(CgLogPath)];
             SoundVol = int.Parse(baseData[nameof(SoundVol)] ?? "5");
-            CustomNotify = baseData[nameof(CustomNotify)] == "1";
             CustomNotifier = baseData[nameof(CustomNotifier)];
 
             // 載入標準關鍵字設定
@@ -95,7 +93,6 @@ namespace CgLogListener
             baseSection[nameof(AppName)] = "CgLogListener";
             baseSection[nameof(CgLogPath)] = string.Empty;
             baseSection[nameof(SoundVol)] = "5";
-            baseSection[nameof(CustomNotify)] = "0";
 
             var fileIniDataParser = new FileIniDataParser();
             fileIniDataParser.WriteFile(settingsFileName, iniData);
@@ -110,7 +107,6 @@ namespace CgLogListener
             baseSection[nameof(AppName)] = AppName;
             baseSection[nameof(CgLogPath)] = CgLogPath;
             baseSection[nameof(SoundVol)] = SoundVol.ToString();
-            baseSection[nameof(CustomNotify)] = CustomNotify ? "1" : "0";
             baseSection[nameof(CustomNotifier)] = CustomNotifier;
 
             var standardTipData = iniData[settingsStandardTipsSection];
@@ -221,10 +217,23 @@ namespace CgLogListener
             UpdateConfig();
         }
 
-        internal void SetCustomNotify(bool value)
+        internal void SetStandardTipCustomNotify(string nameInSetting, bool customNotify)
         {
-            CustomNotify = value;
+            if (!StandardTips.ContainsKey(nameInSetting))
+            {
+                StandardTips[nameInSetting] = new TipNotifyOptions();
+            }
+            StandardTips[nameInSetting].CustomNotify = customNotify;
             UpdateConfig();
+        }
+
+        internal void SetCustomizeTipCustomNotify(string keyword, bool customNotify)
+        {
+            if (CustomizeTips.ContainsKey(keyword))
+            {
+                CustomizeTips[keyword].CustomNotify = customNotify;
+                UpdateConfig();
+            }
         }
 
         internal void SetAppName(string value)

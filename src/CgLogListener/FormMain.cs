@@ -18,6 +18,7 @@ namespace CgLogListener
         private readonly MediaPlayer mp = new MediaPlayer();
         private readonly Dictionary<string, CheckBox> soundCheckBoxes = new Dictionary<string, CheckBox>();
         private readonly Dictionary<string, CheckBox> mailCheckBoxes = new Dictionary<string, CheckBox>();
+        private readonly Dictionary<string, CheckBox> customNotifyCheckBoxes = new Dictionary<string, CheckBox>();
 
         public FormMain()
         {
@@ -63,8 +64,8 @@ namespace CgLogListener
             // set playsound vol
             cgLogListenerTrackBar.Value = settings.SoundVol;
 
-            // set line notify
-            checkBox1.Checked = settings.CustomNotify;
+            // set custom notifier path
+            txtCustomNotifier.Text = settings.CustomNotifier ?? "";
 
             // 設定標準關鍵字及其音效/郵件選項
             SetupStandardTips();
@@ -73,7 +74,7 @@ namespace CgLogListener
             SetupCustomTips();
 
             cgLogListenerTrackBar.ValueChanged += CgLogListenerTrackBar_ValueChanged;
-            checkBox1.CheckedChanged += CheckBox1_CheckedChanged;
+            txtCustomNotifier.Leave += TxtCustomNotifier_Leave;
         }
 
         private void SetupStandardTips()
@@ -89,9 +90,10 @@ namespace CgLogListener
                 cgLogListenerCheckBox7
             };
 
-            // 固定位置讓 🔊/✉ checkbox 對齊
+            // 固定位置讓 S/M/C checkbox 對齊
             const int soundCheckBoxX = 155;
             const int mailCheckBoxX = 210;
+            const int customNotifyCheckBoxX = 265;
 
             foreach (var chk in standardCheckBoxes)
             {
@@ -103,6 +105,30 @@ namespace CgLogListener
                     options = new TipNotifyOptions();
                     settings.SetStandardTip(nameInSetting, options);
                 }
+
+                // 從 settings 讀取 Text 和 RegexPattern（如果有的話，否則使用 Designer 的預設值）
+                if (!string.IsNullOrEmpty(options.Text))
+                {
+                    chk.Text = options.Text;
+                }
+                else
+                {
+                    // 回寫 Designer 的預設值到 settings，方便使用者編輯 settings.ini
+                    options.Text = chk.Text;
+                }
+
+                if (!string.IsNullOrEmpty(options.RegexPattern))
+                {
+                    chk.RegexPattern = options.RegexPattern;
+                }
+                else
+                {
+                    // 回寫 Designer 的預設值到 settings，方便使用者編輯 settings.ini
+                    options.RegexPattern = chk.RegexPattern;
+                }
+
+                // 儲存更新後的設定（確保 Text 和 RegexPattern 被寫入 settings.ini）
+                settings.SetStandardTip(nameInSetting, options);
 
                 // 設定主 checkbox
                 chk.Checked = options.Enabled;
@@ -149,6 +175,22 @@ namespace CgLogListener
                 };
                 panel1.Controls.Add(mailChk);
                 mailCheckBoxes[nameInSetting] = mailChk;
+
+                // 動態建立 CustomNotify checkbox
+                var customNotifyChk = new CheckBox
+                {
+                    Text = "C",
+                    AutoSize = true,
+                    Location = new Point(customNotifyCheckBoxX, chk.Top),
+                    Checked = options.CustomNotify,
+                    Font = new Font("微軟正黑體", 8)
+                };
+                customNotifyChk.CheckedChanged += (s, ev) =>
+                {
+                    settings.SetStandardTipCustomNotify(nameInSetting, ((CheckBox)s).Checked);
+                };
+                panel1.Controls.Add(customNotifyChk);
+                customNotifyCheckBoxes[nameInSetting] = customNotifyChk;
             }
         }
 
@@ -161,6 +203,9 @@ namespace CgLogListener
                     cgLogListenerListBox.Items.Add(kv.Key);
                 }
             }
+
+            // 雙擊修改
+            cgLogListenerListBox.DoubleClick += (s, ev) => BtnEditCus_Click(s, ev);
         }
 
         private void CgLogListenerTrackBar_ValueChanged(object sender, EventArgs e)
@@ -278,14 +323,17 @@ namespace CgLogListener
                         catch { }
                     }
 
-                    // Custom Notifier (全域設定)
-                    if (settings.CustomNotify)
+                    // Custom Notifier (根據個別關鍵字設定)
+                    if (result.CustomNotify && !string.IsNullOrEmpty(settings.CustomNotifier))
                     {
                         foreach (var notifier in settings.CustomNotifier.Split(','))
                         {
+                            var trimmedNotifier = notifier.Trim();
+                            if (string.IsNullOrEmpty(trimmedNotifier)) continue;
+
                             try
                             {
-                                ProcessStartInfo p = new ProcessStartInfo(notifier, $"\"[{settings.AppName}] {log}\"")
+                                ProcessStartInfo p = new ProcessStartInfo(trimmedNotifier, $"\"[{settings.AppName}] {log}\"")
                                 {
                                     WindowStyle = ProcessWindowStyle.Hidden,
                                     CreateNoWindow = true
@@ -313,6 +361,33 @@ namespace CgLogListener
             cgLogListenerListBox.Items.Add(value);
         }
 
+        private void BtnEditCus_Click(object sender, EventArgs e)
+        {
+            if (cgLogListenerListBox.SelectedIndex < 0)
+            {
+                MessageBox.Show(this, "請先選擇要修改的關鍵字", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var oldKeyword = (string)cgLogListenerListBox.SelectedItem;
+            var oldOptions = settings.CustomizeTips[oldKeyword];
+
+            if (FormPrompt.ShowDialogForEdit(this, oldKeyword, oldOptions, out string newKeyword, out TipNotifyOptions newOptions) != DialogResult.OK ||
+                string.IsNullOrEmpty(newKeyword))
+            {
+                return;
+            }
+
+            // 刪除舊的
+            settings.RemoveCustomizeTip(oldKeyword);
+            cgLogListenerListBox.Items.Remove(oldKeyword);
+
+            // 加入新的
+            settings.AddCustomizeTip(newKeyword, newOptions);
+            cgLogListenerListBox.Items.Add(newKeyword);
+            cgLogListenerListBox.SelectedItem = newKeyword;
+        }
+
         private void BtnDelCus_Click(object sender, EventArgs e)
         {
             if (cgLogListenerListBox.SelectedIndex < 0)
@@ -325,18 +400,31 @@ namespace CgLogListener
             cgLogListenerListBox.Items.Remove(selectItem);
         }
 
-        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
+        private void TxtCustomNotifier_Leave(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            settings.SetCustomNotifier(txtCustomNotifier.Text);
+        }
+
+        private void BtnSelectNotifier_Click(object sender, EventArgs e)
+        {
+            var dialog = new OpenFileDialog
             {
-                FormCustomNotifierPrompt.ShowDialog(this, out string value);
-                settings.SetCustomNotify(true);
-                settings.SetCustomNotifier(value);
-            }
-            else
+                Filter = "執行檔 (*.exe)|*.exe|所有檔案 (*.*)|*.*",
+                Title = "選擇 Notifier 程式"
+            };
+
+            if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                settings.SetCustomNotify(false);
-                settings.SetCustomNotifier(string.Empty);
+                var currentPaths = txtCustomNotifier.Text;
+                if (string.IsNullOrEmpty(currentPaths))
+                {
+                    txtCustomNotifier.Text = dialog.FileName;
+                }
+                else
+                {
+                    txtCustomNotifier.Text = currentPaths + "," + dialog.FileName;
+                }
+                settings.SetCustomNotifier(txtCustomNotifier.Text);
             }
         }
 
@@ -492,6 +580,11 @@ namespace CgLogListener
         private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/WindOfNet/CgLogListener");
+        }
+
+        private void txtCookingInterval_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

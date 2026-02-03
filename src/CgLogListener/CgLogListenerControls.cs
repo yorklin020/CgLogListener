@@ -20,7 +20,7 @@ namespace CgLogListener
                 options.Enabled &&
                 Regex.IsMatch(message, RegexPattern))
             {
-                return NotifyResult.Match(options.PlaySound, options.SendMail);
+                return NotifyResult.Match(options.PlaySound, options.SendMail, options.CustomNotify);
             }
 
             return NotifyResult.NoMatch;
@@ -73,12 +73,12 @@ namespace CgLogListener
                         var exps = split[1].Split(',');
                         if (!exps.Any(x => message.Contains(x)))
                         {
-                            return NotifyResult.Match(options.PlaySound, options.SendMail);
+                            return NotifyResult.Match(options.PlaySound, options.SendMail, options.CustomNotify);
                         }
                     }
                     else
                     {
-                        return NotifyResult.Match(options.PlaySound, options.SendMail);
+                        return NotifyResult.Match(options.PlaySound, options.SendMail, options.CustomNotify);
                     }
                 }
             }
