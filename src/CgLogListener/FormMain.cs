@@ -132,6 +132,8 @@ namespace CgLogListener
 
                 // 設定主 checkbox
                 chk.Checked = options.Enabled;
+                chk.AutoSize = false;
+                chk.Width = 150; // 限制寬度，避免長文字蓋掉右邊的 🔊 ✉ C (主 checkbox X=2，🔊 X=155，可用空間 153px)
                 chk.CheckedChanged += (s, ev) =>
                 {
                     var cb = (CgLogListenerCheckBox)s;

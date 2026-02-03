@@ -200,7 +200,7 @@ namespace CgLogListener
             this.cgLogListenerCheckBox7.Location = new System.Drawing.Point(2, 147);
             this.cgLogListenerCheckBox7.Name = "cgLogListenerCheckBox7";
             this.cgLogListenerCheckBox7.NameInSetting = "7";
-            this.cgLogListenerCheckBox7.RegexPattern = "^(?!.*\\d).*壞掉了.*$";
+            this.cgLogListenerCheckBox7.RegexPattern = "^(?!.*×\\d+).*壞掉了";
             this.cgLogListenerCheckBox7.Size = new System.Drawing.Size(119, 19);
             this.cgLogListenerCheckBox7.TabIndex = 18;
             this.cgLogListenerCheckBox7.Text = "物品損壞通知";
