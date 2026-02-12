@@ -32,6 +32,7 @@ namespace CgLogListener
         /// 從 INI 字串解析
         /// 新格式: "Text|RegexPattern|enabled,playSound,sendMail,isRegex,customNotify" 如 "通知文字|regex.*pattern|1,1,0,0,1"
         /// 舊格式: "enabled,playSound,sendMail,isRegex,customNotify" 如 "1,1,0,0,1" (相容)
+        /// 注意: RegexPattern 可能包含 | (regex OR)，所以用 LastIndexOf 從右邊切分
         /// </summary>
         public static TipNotifyOptions Parse(string value)
         {
@@ -40,17 +41,35 @@ namespace CgLogListener
                 return new TipNotifyOptions();
             }
 
-            // 檢查是否為新格式 (包含 |)
-            if (value.Contains("|"))
+            // 新格式: Text|RegexPattern|flags
+            // RegexPattern 可能包含 | (如 "(你|您)")，所以從右邊找最後一個 | 來切 flags
+            var lastPipeIndex = value.LastIndexOf('|');
+            if (lastPipeIndex > 0)
             {
-                var sections = value.Split('|');
-                if (sections.Length >= 3)
+                var flagsPart = value.Substring(lastPipeIndex + 1);
+                var flags = flagsPart.Split(',');
+
+                if (flags.Length >= 3 && IsValidFlags(flags))
                 {
-                    var flags = sections[2].Split(',');
+                    var rest = value.Substring(0, lastPipeIndex);
+                    var firstPipeIndex = rest.IndexOf('|');
+
+                    string text, regexPattern;
+                    if (firstPipeIndex >= 0)
+                    {
+                        text = rest.Substring(0, firstPipeIndex);
+                        regexPattern = rest.Substring(firstPipeIndex + 1);
+                    }
+                    else
+                    {
+                        text = rest;
+                        regexPattern = "";
+                    }
+
                     return new TipNotifyOptions
                     {
-                        Text = sections[0],
-                        RegexPattern = sections[1],
+                        Text = text,
+                        RegexPattern = regexPattern,
                         Enabled = flags.Length > 0 && flags[0] == "1",
                         PlaySound = flags.Length > 1 && flags[1] == "1",
                         SendMail = flags.Length > 2 && flags[2] == "1",
@@ -70,6 +89,16 @@ namespace CgLogListener
                 IsRegex = parts.Length > 3 && parts[3] == "1",
                 CustomNotify = parts.Length > 4 && parts[4] == "1"
             };
+        }
+
+        private static bool IsValidFlags(string[] flags)
+        {
+            for (int i = 0; i < flags.Length; i++)
+            {
+                if (flags[i] != "0" && flags[i] != "1")
+                    return false;
+            }
+            return true;
         }
 
         /// <summary>

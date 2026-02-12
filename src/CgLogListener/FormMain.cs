@@ -117,13 +117,13 @@ namespace CgLogListener
                     options.Text = chk.Text;
                 }
 
-                if (!string.IsNullOrEmpty(options.RegexPattern))
+                if (!string.IsNullOrEmpty(options.RegexPattern) && IsValidRegex(options.RegexPattern))
                 {
                     chk.RegexPattern = options.RegexPattern;
                 }
                 else
                 {
-                    // 回寫 Designer 的預設值到 settings，方便使用者編輯 settings.ini
+                    // regex 為空或不合法（可能被舊版 bug 截斷），回退到 Designer 預設值
                     options.RegexPattern = chk.RegexPattern;
                 }
 
@@ -587,6 +587,19 @@ namespace CgLogListener
         private void txtCookingInterval_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private static bool IsValidRegex(string pattern)
+        {
+            try
+            {
+                Regex.IsMatch("", pattern);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
